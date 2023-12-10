@@ -72,7 +72,7 @@ export function Register() {
       <div className="wrapper">
         <div className="container main-register">
           <div className="row">
-            <div className="col-md-6 left">
+            <div className="col-md-6 left"  style={{backgroundColor: "var(--purpura)", color:"var(--letra)"}}>
               <div className="input-box">
                 <header>Crear cuenta</header>
                 <form onSubmit={handleSubmit}>
@@ -85,6 +85,7 @@ export function Register() {
                       onChange={handleChange}
                       required=""
                       autoComplete="off"
+                      style={{ color:"var(--letra)"}}
                     />
                     <label htmlFor="email">Email</label>
                   </div>
@@ -96,6 +97,7 @@ export function Register() {
                       value={formData.password}
                       onChange={handleChange}
                       required=""
+                      style={{ color:"var(--letra)"}}
                     />
                     <label htmlFor="password">Contraseña</label>
                   </div>
@@ -107,6 +109,7 @@ export function Register() {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       required=""
+                      style={{ color:"var(--letra)"}}
                     />
                     <label htmlFor="confirmPassword">Confirmar Contraseña</label>
                   </div>
@@ -118,6 +121,7 @@ export function Register() {
                       className="input"
                       value={formData.tipoCuenta}
                       onChange={handleChange}
+                      style={{ color:"var(--letra)"}}
                     >
                       <option value="1">Cliente</option>
                       <option value="2">Conductor</option>

@@ -75,7 +75,7 @@ export function Login() {
             <div className="col-md-6 side-image">
               
             </div>
-            <div className="col-md-6 right">
+            <div className="col-md-6 right" style={{backgroundColor: "var(--purpura)", color:"var(--letra)"}}>
               <div className="input-box">
                 <header>Ingresar cuenta</header>
                 
@@ -89,6 +89,7 @@ export function Login() {
                       onChange={handleChange}
                       required=""
                       autoComplete="off"
+                      style={{ color:"var(--letra)"}}
                     />
                     <label htmlFor="email">Email</label>
                   </div>
@@ -100,6 +101,7 @@ export function Login() {
                       value={formData.password}
                       onChange={handleChange}
                       required=""
+                      style={{ color:"var(--letra)"}}
                     />
                     <label htmlFor="password">Password</label>
                   </div>
