@@ -1,0 +1,27 @@
+
+  /* Estilos personalizados para los estados de la tabla */
+  .estado-activo {
+    color: #28a745; /* Verde para activo */
+  }
+  
+  .estado-inactivo {
+    color: #dc3545; /* Rojo para inactivo */
+  }
+  
+  .circulo-estado {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+  }
+
+  body{
+    background-color: var(--white);
+  }
+
+  .card{
+    width: 18rem;
+  }
+
+  

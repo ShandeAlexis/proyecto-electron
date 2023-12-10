@@ -1,0 +1,183 @@
+/* =========== Google Fonts ============ */
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap");
+
+/* =============== Globals ============== */
+* {
+  font-family: "Ubuntu", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  
+}
+
+:root {
+  --purpura: #4682A9;
+  --white: #EEF5FF;
+  --gray: #61360b;
+  --black1: #171b1b;
+  --black2: #000000;
+   --background-day: #fff; /* Color de fondo en modo diurno */
+  --background-night: #333; 
+  --dark: #000;
+  --letra: #000;
+  --fondonoche: 
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+}
+
+
+
+.main {
+  position: absolute;
+  width: calc(100% - 300px);
+
+min-height: 100vh;
+  left: 300px;
+
+  background: var(--white);
+  transition: 0.5s;
+
+  
+  
+}
+
+
+
+
+.imagen {
+  margin-top: 1rem; /* Ajusta según tus necesidades */
+  margin-bottom: 2rem; /* Ajusta según tus necesidades */
+  border-radius: 20px;
+}
+
+.textoinicio {
+
+  text-align: center;
+  padding: 20px; /* Ajusta según tus necesidades */
+  width: 33%;
+  position: absolute;
+  left: 50%;
+}
+
+
+
+.main.active {
+    width: calc(100% - 120px);
+    left: 100px;
+  }
+  
+.topbar {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+  }
+  
+  .toggle {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    cursor: pointer;
+  }
+  
+  .user {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  
+  
+
+  .user img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+
+
+
+  /* ====================== Responsive Design ========================== */
+  @media (max-width: 991px) {
+    .navigation {
+      left: -300px;
+    }
+    .navigation.active {
+      width: 300px;
+      left: 0;
+    }
+    .main {
+      width: 100%;
+      left: 0;
+    }
+    .main.active {
+      left: 300px;
+    }
+    .cardBox {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .details {
+      grid-template-columns: 1fr;
+    }
+    .recentOrders {
+      overflow-x: auto;
+    }
+    .status.inProgress {
+      white-space: nowrap;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .cardBox {
+      grid-template-columns: repeat(1, 1fr);
+    }
+    .cardHeader h2 {
+      font-size: 20px;
+    }
+    .user {
+      min-width: 40px;
+    }
+    .navigation {
+      width: 100%;
+      left: -100%;
+      z-index: 1000;
+    }
+    .navigation.active {
+      width: 100%;
+      left: 0;
+    }
+    .toggle {
+      z-index: 10001;
+    }
+    .main.active .toggle {
+      color: #fff;
+      position: fixed;
+      right: 0;
+      left: initial;
+    }
+  }
+  
+
