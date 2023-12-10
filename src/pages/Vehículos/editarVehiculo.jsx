@@ -13,11 +13,12 @@ export function EditarVehiculo({ vehiculo, onClose, onUpdate }) {
   const [detalleVehiculo, setDetalleVehiculo] = useState({
     fechaSoatVenc: "",
     fechaCirculacionVenc: "",
-    fechaTecnicaVenc: ""
+    fechaTecnicaVenc: "",
   });
   const [tiposVehiculo, setTiposVehiculo] = useState([]);
-  const [tipoVehiculoSeleccionado, setTipoVehiculoSeleccionado] = useState(null);
-  const [formValido, setFormValido] = useState(false); // Agregar esta línea
+  const [tipoVehiculoSeleccionado, setTipoVehiculoSeleccionado] =
+    useState(null);
+  const [formValido, setFormValido] = useState(false);
   const accessToken = authData?.accessToken;
 
   useEffect(() => {
@@ -26,29 +27,36 @@ export function EditarVehiculo({ vehiculo, onClose, onUpdate }) {
       setColorVehiculo(vehiculo.colorVehiculo || "");
       setAlto(vehiculo.alto || "");
       setAncho(vehiculo.ancho || "");
-      setEstado(vehiculo.estado || true);
-      setDetalleVehiculo({
-        fechaSoatVenc: vehiculo.listaDetalleVehiculo[0]?.fechaSoatVenc || "",
-        fechaCirculacionVenc: vehiculo.listaDetalleVehiculo[0]?.fechaCirculacionVenc || "",
-        fechaTecnicaVenc: vehiculo.listaDetalleVehiculo[0]?.fechaTecnicaVenc || ""
-      });
+      setEstado(vehiculo.estado !== undefined ? vehiculo.estado : true);
+      if (
+        vehiculo.listaDetalleVehiculo &&
+        vehiculo.listaDetalleVehiculo.length > 0
+      ) {
+        const primerDetalle = vehiculo.listaDetalleVehiculo[0];
+        setDetalleVehiculo({
+          fechaSoatVenc: primerDetalle.fechaSoatVenc || "",
+          fechaCirculacionVenc: primerDetalle.fechaCirculacionVenc || "",
+          fechaTecnicaVenc: primerDetalle.fechaTecnicaVenc || "",
+        });
+      }
     }
-
     const obtenerTiposVehiculo = async () => {
       try {
         const response = await fetch("http://127.0.0.1:8080/tipo-vehiculos", {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${accessToken}`
+            Authorization: `Bearer ${accessToken}`,
           },
-          redirect: "follow"
+          redirect: "follow",
         });
 
         if (response.ok) {
           const data = await response.json();
           setTiposVehiculo(data);
           if (data.length > 0) {
-            setTipoVehiculoSeleccionado(data[0]);
+            setTipoVehiculoSeleccionado(data.find(
+              (tipo) => tipo.idTipoVehiculo === vehiculo.tipoVehiculo.idTipoVehiculo
+            ));
           }
         } else {
           console.error("Error al obtener tipos de vehículo");
@@ -78,13 +86,16 @@ export function EditarVehiculo({ vehiculo, onClose, onUpdate }) {
 
       const detalleVehiculoFormateado = {
         fechaSoatVenc: convertirAFechaISO(detalleVehiculo.fechaSoatVenc),
-        fechaCirculacionVenc: convertirAFechaISO(detalleVehiculo.fechaCirculacionVenc),
+        fechaCirculacionVenc: convertirAFechaISO(
+          detalleVehiculo.fechaCirculacionVenc
+        ),
         fechaTecnicaVenc: convertirAFechaISO(detalleVehiculo.fechaTecnicaVenc),
       };
 
       const raw = JSON.stringify({
+        idVehiculo: vehiculo.idVehiculo,
         tipoVehiculo: {
-          idTipoVehiculo: tipoVehiculoSeleccionado?.idTipoVehiculo || 1
+          idTipoVehiculo: tipoVehiculoSeleccionado?.idTipoVehiculo || 1,
         },
         placa,
         foto: null,
@@ -92,23 +103,26 @@ export function EditarVehiculo({ vehiculo, onClose, onUpdate }) {
         alto,
         ancho,
         estado,
-        listaDetalleVehiculo: [detalleVehiculoFormateado]
+        listaDetalleVehiculo: [detalleVehiculoFormateado],
       });
 
       const requestOptions = {
         method: "PUT",
         headers: myHeaders,
         body: raw,
-        redirect: "follow"
+        redirect: "follow",
       };
 
-      const response = await fetch(`http://127.0.0.1:8080/vehiculos/${vehiculo.idVehiculo}`, requestOptions);
+      const response = await fetch(
+        `http://127.0.0.1:8080/vehiculos/${vehiculo.idVehiculo}`,
+        requestOptions
+      );
 
       if (response.ok) {
         Swal.fire({
           title: "Buen trabajo!",
           text: "Edición exitosa",
-          icon: "success"
+          icon: "success",
         });
         onUpdate();
         handleClose();
@@ -117,7 +131,7 @@ export function EditarVehiculo({ vehiculo, onClose, onUpdate }) {
         Swal.fire({
           title: "Error",
           text: errorData.message || "Hubo un problema al editar el vehículo",
-          icon: "error"
+          icon: "error",
         });
       }
     } catch (error) {
@@ -125,16 +139,23 @@ export function EditarVehiculo({ vehiculo, onClose, onUpdate }) {
     }
   };
 
-  const validarPlaca = () => {
-    setFormValido(!!placa.trim());
-  };
-
   const handleDetalleVehiculoChange = (field, value) => {
     setDetalleVehiculo({
       ...detalleVehiculo,
-      [field]: value
+      [field]: value,
     });
   };
+
+  const convertirAFechaISO = (fecha) => {
+    const fechaObj = new Date(fecha);
+    const mes = fechaObj.getMonth() + 1; // Se suma 1 porque los meses comienzan desde 0
+    const dia = fechaObj.getDate();
+    const formatoISO = `${fechaObj.getFullYear()}-${
+      mes < 10 ? "0" : ""
+    }${mes}-${dia < 10 ? "0" : ""}${dia}`;
+    return formatoISO;
+  };
+
 
   return (
     <Modal show={true} onHide={handleClose}>
@@ -169,14 +190,9 @@ export function EditarVehiculo({ vehiculo, onClose, onUpdate }) {
               value={placa}
               onChange={(e) => {
                 setPlaca(e.target.value);
-                validarPlaca();
               }}
               placeholder="Ingrese la placa del vehículo"
-              isInvalid={!formValido}
             />
-            <Form.Control.Feedback type="invalid">
-              La placa no puede estar vacía.
-            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group controlId="formColorVehiculo">
@@ -209,13 +225,59 @@ export function EditarVehiculo({ vehiculo, onClose, onUpdate }) {
             />
           </Form.Group>
 
-          {/* Resto del formulario de acuerdo a tus campos */}
+          <Form.Group controlId="formEstado" className="mt-2">
+            <Form.Check
+              type="switch"
+              id="custom-switch"
+              label="Estado del Vehículo"
+              checked={estado}
+              onChange={() => setEstado((prevEstado) => !prevEstado)}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="formDetalleVehiculo" className="mt-2">
+            <Form.Group controlId="formFechaSoatVenc">
+              <Form.Label>Fecha de Vencimiento del SOAT</Form.Label>
+              <Form.Control
+                type="date"
+                value={convertirAFechaISO(detalleVehiculo.fechaSoatVenc)}
+                onChange={(e) =>
+                  handleDetalleVehiculoChange("fechaSoatVenc", e.target.value)
+                }
+              />
+            </Form.Group>
+            <Form.Group controlId="formFechaCirculacionVenc">
+              <Form.Label>Fecha de Vencimiento de Circulación</Form.Label>
+              <Form.Control
+                type="date"
+                value={convertirAFechaISO(detalleVehiculo.fechaCirculacionVenc)}
+                onChange={(e) =>
+                  handleDetalleVehiculoChange(
+                    "fechaCirculacionVenc",
+                    e.target.value
+                  )
+                }
+              />
+            </Form.Group>
+            <Form.Group controlId="formFechaTecnicaVenc">
+              <Form.Label>Fecha de Vencimiento Técnica</Form.Label>
+              <Form.Control
+                type="date"
+                value={convertirAFechaISO(detalleVehiculo.fechaTecnicaVenc)}
+                onChange={(e) =>
+                  handleDetalleVehiculoChange(
+                    "fechaTecnicaVenc",
+                    e.target.value
+                  )
+                }
+              />
+            </Form.Group>
+          </Form.Group>
 
           <Button
             variant="primary"
             type="button"
             onClick={handleGuardarEdicion}
-            disabled={!formValido}
           >
             Guardar
           </Button>

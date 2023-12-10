@@ -45,7 +45,7 @@ export function ListaVehiculos() {
         };
 
         const response = await fetch(
-          `http://127.0.0.1:8080/vehiculos/detach/paginado?page=${currentPage}&size=3`,
+          `http://127.0.0.1:8080/vehiculos/detach/paginado?page=${currentPage}&size=4`,
           requestOptions
         );
 
@@ -86,6 +86,9 @@ export function ListaVehiculos() {
   const handleEditar = (vehiculo) => {
     setEditarVehiculo(vehiculo);
   };
+  const handleUpdateList = () => {
+    setDataChanged((prev) => !prev); // Cambia el estado para forzar la recarga de la lista
+  };
 
   //esos dos es para la paginacion
   const handlePrevPage = () => {
@@ -106,7 +109,6 @@ export function ListaVehiculos() {
             <>
               <TextBrilloso name={"Vehiculos"} />
               <div className="container text-center mt-3">
-                <br />
                 <button
                   style={{ background: "var(--purpura)" }}
                   className="btn btn-success "
@@ -125,7 +127,6 @@ export function ListaVehiculos() {
                   />
                 )}
               </div>
-              
               <div className="d-flex justify-content-center flex-wrap ">
                 {vehiculos.map((vehiculo) => (
                   <Card
@@ -195,13 +196,10 @@ export function ListaVehiculos() {
               </div>
               {editarVehiculo && (
                 <EditarVehiculo
-                  vehiculo={editarVehiculo}
-                  onClose={() => setEditarVehiculo(null)}
-                  onUpdate={() => {
-                    // Aquí puedes realizar acciones después de editar un vehículo, si es necesario
-                    setEditarVehiculo(null); // Cerrar el modal después de editar el vehículo
-                  }}
-                />
+                vehiculo={editarVehiculo}
+                onClose={() => setEditarVehiculo(null)}
+                onUpdate={handleUpdateList}  // Pasa la función onUpdate
+              />
               )}
 
               {/* Modal para detalles */}
