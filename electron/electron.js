@@ -9,8 +9,10 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width,
     height,
+    icon: path.join(__dirname, '../src/assets/logoicon.ico'), // Ruta a tu archivo ICO
      autoHideMenuBar: true,
      resizable: false,
+     movable: false, // Esta opción deshabilita la capacidad de mover la ventana
      frame: true,
      webPreferences: {
        preload: path.join(__dirname, 'preload.js'),
