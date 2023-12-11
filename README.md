@@ -1,6 +1,10 @@
 # React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+Para instalar la dependencias debes poner este comando 
+
+<h2>npm install --force </h2>
+npm install --force 
 
 Currently, two official plugins are available:
 
