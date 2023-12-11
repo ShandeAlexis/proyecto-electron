@@ -5,17 +5,22 @@ import { useAuth } from "../../services/AuthContext";
 import { Error404 } from "../../components/error404";
 import TextBrilloso from "../../components/textoBrilloso";
 import Paginator from "../../components/paginacion";
+import { AgregarCliente } from "./agregarCliente";
+import { EditarCliente } from "./editarCliente"; // Asegúrate de importar el componente de edición
+import Swal from 'sweetalert2';
 
 export function Clientes() {
   const { authData } = useAuth();
   const [clientes, setClientes] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
-  //esto es para la paginacion
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-
+  const [showAgregarModal, setShowAgregarModal] = useState(false);
+  const [showEditarModal, setShowEditarModal] = useState(false);
+  const [clienteActualizado, setClienteActualizado] = useState(false);
   const [totalElements, setTotalElements] = useState(0);
   const [dataChanged, setDataChanged] = useState(false);
+  const [selectedCliente, setSelectedCliente] = useState(null);
 
   useEffect(() => {
     const fetchClientes = async () => {
@@ -59,8 +64,8 @@ export function Clientes() {
   }, [authData, currentPage, dataChanged]);
 
   const onEdit = (cliente) => {
-    // Implementa la lógica de edición según tus necesidades
-    console.log("Editar:", cliente);
+    setSelectedCliente(cliente);
+    setShowEditarModal(true);
   };
 
   const onDelete = (cliente) => {
@@ -68,13 +73,89 @@ export function Clientes() {
     console.log("Eliminar:", cliente);
   };
 
-  //esos dos es para la paginacion
+  const handleCloseAgregarModal = () => {
+    setShowAgregarModal(false);
+    setClienteActualizado(!clienteActualizado);
+  };
+
+  const handleCloseEditarModal = () => {
+    setShowEditarModal(false);
+  };
+
   const handlePrevPage = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
   };
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages - 1));
+  };
+
+  const onDeleteCliente = async (cliente) => {
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: "btn btn-success",
+        cancelButton: "btn btn-danger",
+      },
+      buttonsStyling: false,
+    });
+
+    swalWithBootstrapButtons
+      .fire({
+        title: "¿Estás seguro de eliminar al cliente?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminarlo",
+        cancelButtonText: "No, cancelar",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const accessToken = authData?.accessToken;
+            const myHeaders = new Headers();
+            myHeaders.append("Authorization", `Bearer ${accessToken}`);
+
+            const requestOptions = {
+              method: "DELETE",
+              headers: myHeaders,
+              redirect: "follow",
+            };
+
+            const response = await fetch(
+              `http://127.0.0.1:8080/clientes/${cliente.idCliente}`,
+              requestOptions
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            setClientes((prevClientes) =>
+              prevClientes.filter((c) => c.idCliente !== cliente.idCliente)
+            );
+
+            swalWithBootstrapButtons.fire({
+              title: "Eliminado",
+              text: "El cliente ha sido eliminado con éxito",
+              icon: "success",
+            });
+          } catch (error) {
+            console.error("Error al eliminar el cliente:", error);
+            swalWithBootstrapButtons.fire({
+              title: "Error",
+              text: "Ocurrió un error al eliminar el cliente",
+              icon: "error",
+            });
+          }
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          swalWithBootstrapButtons.fire({
+            title: "Cancelado",
+            text: "El cliente sigue en la base de datos",
+            icon: "error",
+          });
+        }
+      });
   };
 
   return (
@@ -87,11 +168,24 @@ export function Clientes() {
             <>
               <TextBrilloso name={"Clientes"} />
               <div className="container text-center mt-3">
+                {showAgregarModal && (
+                  <AgregarCliente
+                    onClose={handleCloseAgregarModal}
+                    onUpdate={handleCloseAgregarModal}
+                  />
+                )}
+                {showEditarModal && selectedCliente && (
+                  <EditarCliente
+                    cliente={selectedCliente}
+                    onClose={handleCloseEditarModal}
+                    onUpdate={handleCloseEditarModal}
+                  />
+                )}
                 <button
                   type="button"
                   className="btn btn-success d-flex align-items-center justify-content-center"
-                  // onClick={}
-                  style={{ fontSize: "1.2rem" , background:"var(--purpura)" }}
+                  onClick={() => setShowAgregarModal(true)}
+                  style={{ fontSize: "1.2rem", background: "var(--purpura)" }}
                 >
                   <ion-icon
                     name="business-outline"
@@ -138,7 +232,7 @@ export function Clientes() {
                         </button>
                         <button
                           className="btn btn-danger"
-                          onClick={() => onDelete(cliente)}
+                          onClick={() => onDeleteCliente(cliente)}
                         >
                           Eliminar
                         </button>
